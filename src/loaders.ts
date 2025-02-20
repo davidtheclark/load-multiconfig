@@ -5,6 +5,7 @@ import { rm, writeFile } from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { Loader, LoaderSync } from './types.js';
+import { threadId } from 'worker_threads';
 
 let importFresh: typeof import('import-fresh');
 export const loadJsSync: LoaderSync = function loadJsSync(filepath) {
@@ -99,7 +100,8 @@ export const loadTs: Loader = async function loadTs(filepath, content) {
   if (typescript === undefined) {
     typescript = (await import('typescript')).default;
   }
-  const compiledFilepath = `${filepath.slice(0, -2)}mjs`;
+  const parallelSafeStamp = `-pid:${process.pid}-thread:${threadId}`;
+  const compiledFilepath = `${filepath.slice(0, -2)}-${parallelSafeStamp}.mjs`;
   let transpiledContent;
   try {
     try {
