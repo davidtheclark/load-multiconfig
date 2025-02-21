@@ -73,7 +73,8 @@ export const loadTsSync: LoaderSync = function loadTsSync(filepath, content) {
   if (typescript === undefined) {
     typescript = require('typescript');
   }
-  const compiledFilepath = `${filepath.slice(0, -2)}cjs`;
+  const parallelSafeStamp = `pid:${process.pid}-thread:${threadId}`;
+  const compiledFilepath = `${filepath.slice(0, -3)}-${parallelSafeStamp}.cjs`;
   try {
     const config = resolveTsConfig(path.dirname(filepath)) ?? {};
     config.compilerOptions = {
@@ -100,8 +101,8 @@ export const loadTs: Loader = async function loadTs(filepath, content) {
   if (typescript === undefined) {
     typescript = (await import('typescript')).default;
   }
-  const parallelSafeStamp = `-pid:${process.pid}-thread:${threadId}`;
-  const compiledFilepath = `${filepath.slice(0, -2)}-${parallelSafeStamp}.mjs`;
+  const parallelSafeStamp = `pid:${process.pid}-thread:${threadId}`;
+  const compiledFilepath = `${filepath.slice(0, -3)}-${parallelSafeStamp}.mjs`;
   let transpiledContent;
   try {
     try {
